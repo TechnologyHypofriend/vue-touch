@@ -134,6 +134,7 @@
       rotateOptions: createProp(),
       swipeOptions: createProp(),
       tag: { type: String, default: "div" },
+      to: { type: [String, Object], default: null },
       enabled: {
         default: true,
         type: [Boolean, Object],
@@ -174,7 +175,13 @@
 
     mounted() {
       if (typeof window !== "undefined") {
-        this.hammer = new Hammer.Manager(this.$el, this.options);
+        // Use TouchMouseInput to support both touch and mouse events
+        var hammerOptions = assign({}, this.options);
+        // Enable mouse input for desktop support
+        if (Hammer.TouchMouseInput) {
+          hammerOptions.inputClass = Hammer.TouchMouseInput;
+        }
+        this.hammer = new Hammer.Manager(this.$el, hammerOptions);
         this.recognizers = {};
         this.setupBuiltinRecognizers();
         this.setupCustomRecognizers();
@@ -199,14 +206,30 @@
 
     methods: {
       hasListener(gesture) {
+        // Vue 3 native: listeners are in $attrs as onEventName
         const eventName = "on" + capitalize(gesture);
-        return this.$attrs[eventName] !== undefined;
+        if (this.$attrs && this.$attrs[eventName] !== undefined) {
+          return true;
+        }
+        // Vue 2 compat mode: listeners are in _events
+        if (this._events && this._events[gesture] && this._events[gesture].length > 0) {
+          return true;
+        }
+        // Also check $listeners for Vue 2 compat
+        if (this.$listeners && this.$listeners[gesture] !== undefined) {
+          return true;
+        }
+        return false;
       },
 
       setupBuiltinRecognizers() {
         for (let i = 0; i < gestures.length; i++) {
           const gesture = gestures[i];
-          if (this.hasListener(gesture)) {
+          // Always setup tap recognizer for click/tap support
+          // Also setup recognizer if `to` prop is set for navigation
+          const isTapGesture = gesture === 'tap';
+          const needsRecognizer = this.hasListener(gesture) || (isTapGesture && this.to) || isTapGesture;
+          if (needsRecognizer) {
             const mainGesture = gestureMap[gesture];
             const options = assign(
               {},
@@ -247,7 +270,19 @@
       },
 
       addEvent(gesture) {
-        this.hammer.on(gesture, (e) => this.$emit(gesture, e));
+        this.hammer.on(gesture, (e) => {
+          this.$emit(gesture, e);
+          // Handle router navigation on tap
+          if (gesture === 'tap' && this.to) {
+            this.navigate();
+          }
+        });
+      },
+
+      navigate() {
+        if (this.$router && this.to) {
+          this.$router.push(this.to);
+        }
       },
 
       updateEnabled(newVal, oldVal) {
