@@ -1,11 +1,11 @@
 {
-  "name": "vue-touch",
-  "version": "3.0.2",
-  "main": "vue-touch.js",
-  "module": "vue-touch.js",
+  "name": "vue-touch-vue3",
+  "version": "3.0.3",
+  "main": "vue-touch-vue3.js",
+  "module": "vue-touch-vue3.js",
   "files": [
-    "vue-touch.js",
-    "vue-touch.min.js"
+    "vue-touch-vue3.js",
+    "vue-touch-vue3.min.js"
   ],
   "description": "Hammer.js based touch events plugin for Vue.js 3",
   "license": "MIT",
