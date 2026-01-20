@@ -205,6 +205,9 @@ export default {
   },
 
   render() {
-    return h(this.tag, {}, this.$slots.default ? this.$slots.default() : []);
+    // Handle both Vue 3 native (function) and Vue 2 compat mode (array)
+    const defaultSlot = this.$slots.default;
+    const children = typeof defaultSlot === "function" ? defaultSlot() : defaultSlot || [];
+    return h(this.tag, {}, children);
   },
 };
