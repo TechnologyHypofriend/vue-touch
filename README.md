@@ -1,8 +1,8 @@
-# vue-touch (Vue 3)
+# vue-touch-vue3
 
 > Touch events plugin for Vue.js 3
 
-This is a directive wrapper for Hammer.js 2.0, updated for Vue 3 compatibility.
+This is a Vue 3 component wrapper for Hammer.js 2.0.
 
 ## Install
 
@@ -42,23 +42,32 @@ Include Vue, Hammer.js, and vue-touch-vue3.js via `<script>` tags:
 
 ## Usage
 
-#### Using the `v-touch` directive
+#### Using the `<v-touch>` component
 
 ```html
 <template>
-  <a v-touch:tap="onTap">Tap me!</a>
-  <div v-touch:swipeleft="onSwipeLeft">Swipe me!</div>
+  <v-touch tag="button" @tap="onTap">Tap me!</v-touch>
+  <v-touch @swipeleft="onSwipeLeft">Swipe me!</v-touch>
 </template>
 
 <script setup>
-  function onTap(e) {
-    console.log("Tapped!", e);
-  }
+function onTap(e) {
+  console.log("Tapped!", e);
+}
 
-  function onSwipeLeft(e) {
-    console.log("Swiped left!", e);
-  }
+function onSwipeLeft(e) {
+  console.log("Swiped left!", e);
+}
 </script>
+```
+
+#### Rendering a different element
+
+By default, `<v-touch>` renders a `<div>`. Use the `tag` prop to change it:
+
+```html
+<v-touch tag="button" @tap="onTap">Tap me!</v-touch>
+<v-touch tag="a" @tap="onTap">Tap link!</v-touch>
 ```
 
 #### Available Events
@@ -87,19 +96,18 @@ VueTouch.config.swipe = {
 app.use(VueTouch);
 ```
 
-**Per-element options with `v-touch-options`:**
+**Per-component options:**
+
+Use the `*Options` props:
 
 ```html
-<!-- detect only horizontal pans with a threshold of 100 -->
-<div
-  v-touch:pan="onPan"
-  v-touch-options:pan="{ direction: 'horizontal', threshold: 100 }"
+<v-touch
+  @pan="onPan"
+  :pan-options="{ direction: 'horizontal', threshold: 100 }"
 >
   Pan me horizontally
-</div>
+</v-touch>
 ```
-
-Note: `v-touch-options` must be placed before or alongside `v-touch` on the same element.
 
 #### Registering Custom Events
 
@@ -117,7 +125,19 @@ app.use(VueTouch);
 ```
 
 ```html
-<a v-touch:doubletap="onDoubleTap">Double tap me!</a>
+<v-touch @doubletap="onDoubleTap">Double tap me!</v-touch>
+```
+
+#### Enabling / Disabling
+
+```html
+<!-- Disable all recognizers -->
+<v-touch :enabled="false" @tap="onTap">Disabled</v-touch>
+
+<!-- Disable specific recognizers -->
+<v-touch :enabled="{ tap: false, swipe: true }" @tap="onTap" @swipe="onSwipe">
+  Swipe only
+</v-touch>
 ```
 
 ## Example Component
@@ -125,17 +145,17 @@ app.use(VueTouch);
 ```vue
 <template>
   <div class="touch-demo">
-    <div
-      v-touch:pan="onPan"
-      v-touch:tap="onTap"
-      v-touch:swipeleft="onSwipeLeft"
-      v-touch:swiperight="onSwipeRight"
-      v-touch-options:pan="{ direction: 'all' }"
+    <v-touch
+      @pan="onPan"
+      @tap="onTap"
+      @swipeleft="onSwipeLeft"
+      @swiperight="onSwipeRight"
+      :pan-options="{ direction: 'all' }"
       class="touch-area"
       :style="{ transform: `translate(${x}px, ${y}px)` }"
     >
       Touch me!
-    </div>
+    </v-touch>
     <p>Last event: {{ lastEvent }}</p>
   </div>
 </template>

@@ -1,27 +1,17 @@
 {
   "name": "vue-touch-vue3",
-  "version": "3.0.3",
-  "main": "vue-touch-vue3.js",
-  "module": "vue-touch-vue3.js",
+  "version": "3.0.4",
+  "main": "dist/vue-touch.js",
+  "module": "src/index.js",
   "files": [
-    "vue-touch-vue3.js",
-    "vue-touch-vue3.min.js"
+    "dist",
+    "src"
   ],
-  "description": "Hammer.js based touch events plugin for Vue.js 3",
+  "description": "Hammer.js based touch events plugin for Vue.js 3.x",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TechnologyHypofriend/vue-touch.git"
-  },
-  "bugs": "https://github.com/TechnologyHypofriend/vue-touch/issues",
-  "peerDependencies": {
-    "vue": "^3.0.0"
-  },
-  "dependencies": {
-    "hammerjs": "^2.0.8"
-  },
-  "devDependencies": {
-    "vue": "^3.4.0"
+    "url": "https://github.com/anthropics/vue-touch-vue3.git"
   },
   "keywords": [
     "vue",
@@ -31,6 +21,16 @@
     "hammer",
     "swipe",
     "pan",
-    "pinch"
-  ]
+    "pinch",
+    "tap"
+  ],
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "dependencies": {
+    "hammerjs": "^2.0.8"
+  },
+  "devDependencies": {
+    "vue": "^3.4.0"
+  }
 }
