@@ -22,7 +22,6 @@ export default {
     rotateOptions: createProp(),
     swipeOptions: createProp(),
     tag: { type: String, default: "div" },
-    to: { type: [String, Object], default: null },
     enabled: {
       default: true,
       type: [Boolean, Object],
@@ -104,7 +103,11 @@ export default {
         return true;
       }
       // Vue 2 compat mode: listeners are in _events
-      if (this._events && this._events[gesture] && this._events[gesture].length > 0) {
+      if (
+        this._events &&
+        this._events[gesture] &&
+        this._events[gesture].length > 0
+      ) {
         return true;
       }
       // Also check $listeners for Vue 2 compat
@@ -117,11 +120,7 @@ export default {
     setupBuiltinRecognizers() {
       for (let i = 0; i < gestures.length; i++) {
         const gesture = gestures[i];
-        // Always setup tap recognizer for click/tap support
-        // Also setup recognizer if `to` prop is set for navigation
-        const isTapGesture = gesture === 'tap';
-        const needsRecognizer = this.hasListener(gesture) || (isTapGesture && this.to) || isTapGesture;
-        if (needsRecognizer) {
+        if (this.hasListener(gesture)) {
           const mainGesture = gestureMap[gesture];
           const options = assign(
             {},
@@ -162,19 +161,7 @@ export default {
     },
 
     addEvent(gesture) {
-      this.hammer.on(gesture, (e) => {
-        this.$emit(gesture, e);
-        // Handle router navigation on tap
-        if (gesture === 'tap' && this.to) {
-          this.navigate();
-        }
-      });
-    },
-
-    navigate() {
-      if (this.$router && this.to) {
-        this.$router.push(this.to);
-      }
+      this.hammer.on(gesture, (e) => this.$emit(gesture, e));
     },
 
     updateEnabled(newVal, oldVal) {
@@ -242,7 +229,8 @@ export default {
   render() {
     // Handle both Vue 3 native (function) and Vue 2 compat mode (array)
     const defaultSlot = this.$slots.default;
-    const children = typeof defaultSlot === "function" ? defaultSlot() : defaultSlot || [];
+    const children =
+      typeof defaultSlot === "function" ? defaultSlot() : defaultSlot || [];
     return h(this.tag, {}, children);
   },
 };

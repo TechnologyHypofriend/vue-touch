@@ -1,10 +1,18 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vue'), require('hammerjs')) :
-  typeof define === 'function' && define.amd ? define(['vue', 'hammerjs'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.VueTouch = factory(global.Vue, global.Hammer));
-})(this, (function (vue, Hammer) { 'use strict';
+  typeof exports === "object" && typeof module !== "undefined"
+    ? (module.exports = factory(require("vue"), require("hammerjs")))
+    : typeof define === "function" && define.amd
+    ? define(["vue", "hammerjs"], factory)
+    : ((global =
+        typeof globalThis !== "undefined" ? globalThis : global || self),
+      (global.VueTouch = factory(global.Vue, global.Hammer)));
+})(this, function (vue, Hammer) {
+  "use strict";
 
-  Hammer = Hammer && Object.prototype.hasOwnProperty.call(Hammer, 'default') ? Hammer['default'] : Hammer;
+  Hammer =
+    Hammer && Object.prototype.hasOwnProperty.call(Hammer, "default")
+      ? Hammer["default"]
+      : Hammer;
 
   function assign(target, ...sources) {
     for (let i = 0; i < sources.length; i++) {
@@ -134,7 +142,6 @@
       rotateOptions: createProp(),
       swipeOptions: createProp(),
       tag: { type: String, default: "div" },
-      to: { type: [String, Object], default: null },
       enabled: {
         default: true,
         type: [Boolean, Object],
@@ -212,7 +219,11 @@
           return true;
         }
         // Vue 2 compat mode: listeners are in _events
-        if (this._events && this._events[gesture] && this._events[gesture].length > 0) {
+        if (
+          this._events &&
+          this._events[gesture] &&
+          this._events[gesture].length > 0
+        ) {
           return true;
         }
         // Also check $listeners for Vue 2 compat
@@ -225,16 +236,12 @@
       setupBuiltinRecognizers() {
         for (let i = 0; i < gestures.length; i++) {
           const gesture = gestures[i];
-          // Always setup tap recognizer for click/tap support
-          // Also setup recognizer if `to` prop is set for navigation
-          const isTapGesture = gesture === 'tap';
-          const needsRecognizer = this.hasListener(gesture) || (isTapGesture && this.to) || isTapGesture;
-          if (needsRecognizer) {
+          if (this.hasListener(gesture)) {
             const mainGesture = gestureMap[gesture];
             const options = assign(
               {},
               config[mainGesture] || {},
-              this[`${mainGesture}Options`]
+              this[`${mainGesture}Options`],
             );
             this.addRecognizer(mainGesture, options);
             this.addEvent(gesture);
@@ -261,7 +268,7 @@
       addRecognizer(gesture, options, { mainGesture } = {}) {
         if (!this.recognizers[gesture]) {
           const recognizer = new Hammer[capitalize(mainGesture || gesture)](
-            guardDirections(options)
+            guardDirections(options),
           );
           this.recognizers[gesture] = recognizer;
           this.hammer.add(recognizer);
@@ -270,19 +277,7 @@
       },
 
       addEvent(gesture) {
-        this.hammer.on(gesture, (e) => {
-          this.$emit(gesture, e);
-          // Handle router navigation on tap
-          if (gesture === 'tap' && this.to) {
-            this.navigate();
-          }
-        });
-      },
-
-      navigate() {
-        if (this.$router && this.to) {
-          this.$router.push(this.to);
-        }
+        this.hammer.on(gesture, (e) => this.$emit(gesture, e));
       },
 
       updateEnabled(newVal, oldVal) {
@@ -348,11 +343,12 @@
     },
 
     render() {
-    // Handle both Vue 3 native (function) and Vue 2 compat mode (array)
-    const defaultSlot = this.$slots.default;
-    const children = typeof defaultSlot === 'function' ? defaultSlot() : defaultSlot || [];
-    return vue.h(this.tag, {}, children);
-  },
+      // Handle both Vue 3 native (function) and Vue 2 compat mode (array)
+      const defaultSlot = this.$slots.default;
+      const children =
+        typeof defaultSlot === "function" ? defaultSlot() : defaultSlot || [];
+      return vue.h(this.tag, {}, children);
+    },
   };
 
   let installed = false;
@@ -365,7 +361,10 @@
     installed = true;
   };
 
-  vueTouch.registerCustomEvent = function registerCustomEvent(event, options = {}) {
+  vueTouch.registerCustomEvent = function registerCustomEvent(
+    event,
+    options = {},
+  ) {
     if (installed) {
       console.warn(`
         [vue-touch]: Custom Event '${event}' couldn't be added to vue-touch.
@@ -389,5 +388,4 @@
   vueTouch.component = Component;
 
   return vueTouch;
-
-}));
+});
